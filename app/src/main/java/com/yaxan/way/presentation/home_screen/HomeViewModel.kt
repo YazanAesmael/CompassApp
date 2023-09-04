@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import javax.inject.Inject
-import kotlin.math.abs
 import kotlin.math.roundToInt
 
 @HiltViewModel
@@ -34,6 +33,7 @@ class HomeViewModel @Inject constructor(
     fun startSensors() { compass.startListening() }
 
     fun startCardinal() { cardinal.init() }
+
 }
 
 const val alpha = 0.1f // Smoothing factor (0 < alpha < 1)

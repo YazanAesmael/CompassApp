@@ -6,13 +6,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +27,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -35,7 +36,6 @@ import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -63,6 +63,20 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltView
     val scope = rememberCoroutineScope()
     val heading by viewModel.heading.collectAsState()
 
+    val direction = when {
+        currentDegree >= 337.5 || currentDegree < 22.5 -> Cardinal.NORTH
+        currentDegree >= 22.5 && currentDegree < 67.5 -> Cardinal.NORTHEAST
+        currentDegree >= 67.5 && currentDegree < 112.5 -> Cardinal.EAST
+        currentDegree >= 112.5 && currentDegree < 157.5 -> Cardinal.SOUTHEAST
+        currentDegree >= 157.5 && currentDegree < 202.5 -> Cardinal.SOUTH
+        currentDegree >= 202.5 && currentDegree < 247.5 -> Cardinal.SOUTHWEST
+        currentDegree >= 247.5 && currentDegree < 292.5 -> Cardinal.WEST
+        currentDegree >= 292.5 && currentDegree < 337.5 -> Cardinal.NORTHWEST
+        else -> null
+    }
+
+    val letter = direction?.letter ?: ""
+
     DisposableEffect(Unit) {
         val dataManager = SensorDataManager(context)
         dataManager.init()
@@ -82,45 +96,40 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltView
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(white),
-        verticalArrangement = Arrangement.SpaceBetween,
+            .background(darkBlue),
+        verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier
-                .padding(16.dp)
-                .fillMaxSize()
-                .background(blue, RoundedCornerShape(16.dp))
-                .clip(RoundedCornerShape(16.dp))
-        ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = "$currentDegree°",
-                color = red,
+                text = "${currentDegree.toInt()}° $letter",
+                color = Color.White,
                 fontSize = 32.sp,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp)
-                    .align(Alignment.TopCenter),
+                    .padding(top = 8.dp),
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.SemiBold,
                 fontFamily = FontFamily.Monospace
             )
-            CompassView(
-                heading = currentDegree,
-                modifier = Modifier
-                    .padding(top = 64.dp)
-                    .fillMaxWidth()
-                    .align(Alignment.Center)
-            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Icon(imageVector = Icons.Filled.ArrowDropDown, contentDescription = "Arrow Down", tint = white)
         }
+        Spacer(modifier = Modifier.height(32.dp))
+        CompassView(
+            heading = currentDegree,
+            modifier = Modifier
+                .padding(top = 64.dp)
+                .fillMaxWidth(),
+        )
+        Spacer(modifier = Modifier.height(84.dp))
     }
 }
 
 @Composable
 fun CompassView(heading: Float, modifier: Modifier) {
-    val circleColor = MaterialTheme.colorScheme.onBackground
     val arrowPosColor = red
-    val arrowNegColor = darkBlue
+    val arrowNegColor = blue
 
     Box(
         modifier = modifier,
@@ -140,24 +149,27 @@ fun CompassView(heading: Float, modifier: Modifier) {
 
             val arrowPath = Path()
             arrowPath.moveTo(size.width / 2, (size.height * .9).toFloat())
-            arrowPath.lineTo(size.width / 2 + 30, size.height / 2)
-            arrowPath.lineTo(size.width / 2 - 30, size.height / 2)
+            arrowPath.lineTo(size.width / 2 + 16, size.height / 2)
+            arrowPath.lineTo(size.width / 2 - 16, size.height / 2)
             arrowPath.lineTo(size.width / 2, (size.height * .9).toFloat())
+
 
             rotate(-heading) {
                 Cardinal.values().forEach {
                     rotate(it.degree.toFloat()) {
-                        drawContext.canvas.nativeCanvas.apply {
-                            drawText(
-                                it.letter,
-                                size.width / 2,
-                                -(size.width / 2 + 40),
-                                Paint().apply {
-                                    textSize = 50f
-                                    color = if (it.letter == "N") red.toArgb() else gray.toArgb()
-                                    textAlign = Paint.Align.CENTER
-                                }
-                            )
+                        if (it.letter.length == 1) {
+                            drawContext.canvas.nativeCanvas.apply {
+                                drawText(
+                                    it.letter,
+                                    size.width / 2,
+                                    -(size.width / 2 - 95),
+                                    Paint().apply {
+                                        textSize = 70f
+                                        color = Color.White.toArgb()
+                                        textAlign = Paint.Align.CENTER
+                                    }
+                                )
+                            }
                         }
                     }
                 }
@@ -165,11 +177,32 @@ fun CompassView(heading: Float, modifier: Modifier) {
                 for (i in 0..350 step 10) {
                     rotate(i.toFloat()) {
                         drawLine(
-                            color = white,
-                            start = Offset(x = size.width / 2, ((size.height / 2) - size.width) + 25),
-                            end = Offset(x = size.width / 2, (size.height / 2) - size.width),
-                            strokeWidth = 5f,
+                            color = if (i == 0) red else white,
+                            start = Offset(
+                                x = size.width / 2,
+                                ((size.height / 2) - size.width) + (if (i == 0) 35 else 25)
+                            ),
+                            end = Offset(
+                                x = size.width / 2,
+                                (size.height / 2) - size.width - (if (i == 0) 35 else 0)
+                            ),
+                            strokeWidth = if (i == 0) 8f else 5f,
                         )
+
+                        if (i % 30 == 0) {
+                            drawContext.canvas.nativeCanvas.apply {
+                                drawText(
+                                    i.toString(),
+                                    size.width / 2,
+                                    -(size.width / 2 + 40),
+                                    Paint().apply {
+                                        textSize = 40f
+                                        color = Color.White.toArgb()
+                                        textAlign = Paint.Align.CENTER
+                                    }
+                                )
+                            }
+                        }
                     }
                 }
 
@@ -178,13 +211,6 @@ fun CompassView(heading: Float, modifier: Modifier) {
                     drawPath(arrowPath, SolidColor(arrowPosColor))
                 }
             }
-
-            drawLine(
-                color = gray,
-                start = Offset(x = size.width / 2, ((size.height / 2) - size.width) + 30),
-                end = Offset(x = size.width / 2, ((size.height / 2) - size.width) - 30),
-                strokeWidth = 10f,
-            )
         }
     }
 }
