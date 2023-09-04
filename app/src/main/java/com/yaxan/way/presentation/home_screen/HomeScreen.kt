@@ -54,6 +54,7 @@ val blue = Color(0xFFBDD5EA)
 val darkBlue = Color(0xFF577399)
 val gray = Color(0xFF495867)
 val red = Color(0xFFFE5F55)
+val green = Color(0xFF9BFE55)
 
 @Composable
 fun HomeScreen(navController: NavController, viewModel: HomeViewModel = hiltViewModel()) {
