@@ -1,6 +1,6 @@
 # Android Compass App
 
-This GitHub repository contains the source code for an Android Compass App developed by Yaxan. The app utilizes Kotlin and Jetpack Compose to create a simple yet functional compass that provides real-time heading information.
+This GitHub repository contains the source code for an Android Compass App. The app utilizes Kotlin and Jetpack Compose to create a simple yet functional compass that provides real-time heading information.
 
 ## Features
 
