@@ -66,9 +66,3 @@ If you would like to contribute to this project, please follow these guidelines:
 ## License
 
 This Android Compass App is open-source and available under the MIT License. See the [LICENSE](LICENSE) file for details.
-
-## Contact
-
-For any questions or feedback, feel free to visit my GitHub profile at [github.com/YazanAesmael](https://github.com/YazanAesmael).
-
-Enjoy using the Compose Compass App!
